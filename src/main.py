@@ -4,6 +4,7 @@ import argparse
 
 from src.config import read_config
 from src.graph import TestRepository, build_graph
+from src.order import dependency_order
 from src.registry import NpmRegistry
 
 
@@ -15,7 +16,7 @@ def parse_arguments():
 
 
 def main():
-    """Формирует граф зависимостей рекурсивным BFS (этап 3)."""
+    """Показывает порядок зависимостей (этап 4)."""
     arguments = parse_arguments()
     try:
         config = read_config(arguments.config)
@@ -26,9 +27,13 @@ def main():
     except ValueError as error:
         print(f"Ошибка: {error}")
         return 1
-    print(f"Граф зависимостей {config.package}:")
-    for package, children in graph.items():
-        print(f"  {package}: {', '.join(children) or '(нет)'}")
+    ordered, blocked = dependency_order(graph)
+    print(f"Порядок зависимостей для {config.package}:")
+    for index, package in enumerate(ordered, 1):
+        print(f"  {index}. {package}")
+    if blocked:
+        print("Внимание: цикл или зависимость от цикла:",
+              ", ".join(blocked))
     return 0
 
 
