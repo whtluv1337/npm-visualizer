@@ -1,0 +1,6 @@
+package = "A"
+repository = "fixtures/demo.json"
+test_mode = true
+output = "output/demo.svg"
+ascii_tree = true
+filter_substring = ""
