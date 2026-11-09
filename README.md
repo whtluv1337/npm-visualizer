@@ -53,3 +53,18 @@ Linux/macOS: `./run.sh configs/test.toml`.
 `devDependencies`, `peerDependencies` и `optionalDependencies` не включаются.
 Необходим доступ в интернет. Для текущего этапа анализируется релиз
 `latest` каждого npm-пакета.
+
+## Этап 3 — рекурсивный BFS
+
+Граф строится по уровням. Вложенная функция `visit_level` рекурсивно
+переходит к следующему уровню; множество `visited` защищает от циклов.
+Фильтр `filter_substring` исключает совпадающие имена и их ветви.
+
+Учебный режим использует JSON вида `{"A": ["B"], "B": []}`. Все вершины
+обязаны присутствовать в словаре, имена — только заглавные латинские буквы.
+
+```powershell
+.\run.bat configs\test.toml
+.\run.bat configs\cycle.toml
+.\run.bat configs\filter.toml
+```

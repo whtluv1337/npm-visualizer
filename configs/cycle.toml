@@ -1,0 +1,6 @@
+package = "A"
+repository = "fixtures/cycle.json"
+test_mode = true
+output = "output/cycle.svg"
+ascii_tree = true
+filter_substring = ""

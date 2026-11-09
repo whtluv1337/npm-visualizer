@@ -3,6 +3,7 @@
 import argparse
 
 from src.config import read_config
+from src.graph import TestRepository, build_graph
 from src.registry import NpmRegistry
 
 
@@ -14,22 +15,20 @@ def parse_arguments():
 
 
 def main():
-    """Выводит прямые npm-зависимости (этап 2)."""
+    """Формирует граф зависимостей рекурсивным BFS (этап 3)."""
     arguments = parse_arguments()
     try:
         config = read_config(arguments.config)
-        if config.test_mode:
-            raise ValueError("тестовый режим появится на этапе 3")
-        registry = NpmRegistry(config.repository)
-        dependencies = registry.dependencies(config.package)
+        repository = (TestRepository(config.repository) if config.test_mode
+                      else NpmRegistry(config.repository))
+        graph = build_graph(config.package, repository,
+                            config.filter_substring)
     except ValueError as error:
         print(f"Ошибка: {error}")
         return 1
-    print(f"Прямые зависимости {config.package}:")
-    for dependency in dependencies:
-        print(f"  {dependency}")
-    if not dependencies:
-        print("  (нет зависимостей)")
+    print(f"Граф зависимостей {config.package}:")
+    for package, children in graph.items():
+        print(f"  {package}: {', '.join(children) or '(нет)'}")
     return 0
 
 
