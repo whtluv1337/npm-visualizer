@@ -6,6 +6,7 @@ from src.config import read_config
 from src.graph import TestRepository, build_graph
 from src.order import dependency_order
 from src.registry import NpmRegistry
+from src.visual import ascii_tree, save_graph
 
 
 def parse_arguments():
@@ -16,7 +17,7 @@ def parse_arguments():
 
 
 def main():
-    """Показывает порядок зависимостей (этап 4)."""
+    """Строит граф, показывает порядок и сохраняет визуализацию."""
     arguments = parse_arguments()
     try:
         config = read_config(arguments.config)
@@ -24,16 +25,22 @@ def main():
                       else NpmRegistry(config.repository))
         graph = build_graph(config.package, repository,
                             config.filter_substring)
-    except ValueError as error:
+        ordered, blocked = dependency_order(graph)
+        d2_file, svg_file, renderer = save_graph(graph, config.output)
+    except (ValueError, OSError) as error:
         print(f"Ошибка: {error}")
         return 1
-    ordered, blocked = dependency_order(graph)
-    print(f"Порядок зависимостей для {config.package}:")
-    for index, package in enumerate(ordered, 1):
-        print(f"  {index}. {package}")
+    print(f"Пакет: {config.package}")
+    print(f"Граф: {len(graph)} вершин, "
+          f"{sum(map(len, graph.values()))} рёбер")
+    print("Порядок зависимостей:", ", ".join(ordered) or "(нет)")
     if blocked:
-        print("Внимание: цикл или зависимость от цикла:",
-              ", ".join(blocked))
+        print("Есть цикл или зависимость от цикла:", ", ".join(blocked))
+    if config.ascii_tree:
+        print("ASCII-дерево:")
+        print(ascii_tree(config.package, graph))
+    print(f"D2: {d2_file}")
+    print(f"SVG: {svg_file} ({renderer})")
     return 0
 
 

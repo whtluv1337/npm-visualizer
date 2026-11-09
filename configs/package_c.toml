@@ -1,0 +1,6 @@
+package = "C"
+repository = "fixtures/branches.json"
+test_mode = true
+output = "output/package_c.svg"
+ascii_tree = true
+filter_substring = ""
