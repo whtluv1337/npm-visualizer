@@ -40,3 +40,16 @@ Linux/macOS: `./run.sh configs/test.toml`.
 - `filter_substring` — исключать пакеты, содержащие эту подстроку.
 
 На первом этапе приложение выводит все настройки и проверяет ошибки.
+
+## Этап 2 — прямые зависимости npm
+
+```powershell
+.\run.bat configs\npm.toml
+```
+
+Программа обращается к публичному HTTP API реестра npm (`/package/latest`),
+из поля `dependencies` получает **прямые runtime-зависимости** и выводит их.
+Не используется npm CLI или библиотека для анализа зависимостей.
+`devDependencies`, `peerDependencies` и `optionalDependencies` не включаются.
+Необходим доступ в интернет. Для текущего этапа анализируется релиз
+`latest` каждого npm-пакета.

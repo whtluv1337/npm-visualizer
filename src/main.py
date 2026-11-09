@@ -3,6 +3,7 @@
 import argparse
 
 from src.config import read_config
+from src.registry import NpmRegistry
 
 
 def parse_arguments():
@@ -13,15 +14,22 @@ def parse_arguments():
 
 
 def main():
-    """Читает конфигурацию и показывает её значения (этап 1)."""
+    """Выводит прямые npm-зависимости (этап 2)."""
     arguments = parse_arguments()
     try:
         config = read_config(arguments.config)
+        if config.test_mode:
+            raise ValueError("тестовый режим появится на этапе 3")
+        registry = NpmRegistry(config.repository)
+        dependencies = registry.dependencies(config.package)
     except ValueError as error:
         print(f"Ошибка: {error}")
         return 1
-    for name, value in vars(config).items():
-        print(f"{name}: {value}")
+    print(f"Прямые зависимости {config.package}:")
+    for dependency in dependencies:
+        print(f"  {dependency}")
+    if not dependencies:
+        print("  (нет зависимостей)")
     return 0
 
 
